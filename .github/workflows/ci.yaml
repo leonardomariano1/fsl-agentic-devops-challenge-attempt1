@@ -100,3 +100,19 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+  guard-stage-source:
+    if: github.base_ref == 'stage'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Only devel may be merged into stage
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_REF" != "devel" ]; then
+            echo "::error::PRs into stage must come from devel (got '$HEAD_REF')"
+            exit 1
+          fi
